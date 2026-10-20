@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>LeadHunter</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@500;700&family=Instrument+Sans:wght@400;500;600&display=swap">
+<style>
+:root{--bg:#030907;--bg2:#08130f;--line:#12382b;--em:#10b981;--neon:#4dffb0;--tx:#e6f5ee;--mu:#8fb3a3;--warn:#f5c451;--err:#ff6b6b;
+--fd:'Sora',system-ui,sans-serif;--fb:'Instrument Sans',system-ui,sans-serif;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:env(safe-area-inset-top,0px);height:100%}
+*{box-sizing:border-box}
+body{margin:0;min-height:100%;background:var(--bg);color:var(--tx);font:15px/1.55 var(--fb);color-scheme:dark}
+#glow{position:fixed;inset:0;pointer-events:none;z-index:0;background:radial-gradient(420px circle at var(--mx,50%) var(--my,30%),rgba(77,255,176,.09),transparent 70%)}
+h1,h2,h3{font-family:var(--fd);margin:0;line-height:1.1;letter-spacing:-.02em}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:2px solid var(--neon);outline-offset:2px}
+.btn{border:1px solid var(--em);background:linear-gradient(180deg,#0f9d6f,#0a6b4c);padding:.7rem 1.2rem;border-radius:10px;font-weight:600;transition:transform .15s,box-shadow .2s}
+.btn:hover{box-shadow:0 0 24px rgba(16,185,129,.45)}.btn:active{transform:scale(.97)}
+.btn.ghost{background:transparent;border-color:var(--line)}.btn.ghost:hover{border-color:var(--em)}
+.btn[disabled]{opacity:.45;cursor:not-allowed;box-shadow:none}
+.card{background:linear-gradient(160deg,rgba(16,185,129,.07),rgba(8,19,15,.9));border:1px solid var(--line);border-radius:14px;padding:1.25rem;position:relative;transition:border-color .25s,transform .25s;transform-style:preserve-3d}
+.card:hover{border-color:var(--em)}
+.mu{color:var(--mu)}
+.wrap{max-width:1120px;margin:0 auto;padding:0 1.25rem;position:relative;z-index:1}
+/* landing */
+#landing nav{display:flex;justify-content:space-between;align-items:center;padding:1.1rem 0}
+.logo{font-family:var(--fd);font-weight:700;font-size:1.15rem}.logo b{color:var(--neon)}
+.hero{position:relative;min-height:84vh;display:grid;align-items:center}
+#globe{position:absolute;right:-4%;top:50%;transform:translateY(-50%);width:min(620px,92vw);aspect-ratio:1;z-index:0}
+.hero .txt{position:relative;z-index:1;max-width:560px}
+.hero h1{font-size:clamp(2.2rem,5.4vw,3.9rem)}
+.hero p{font-size:1.1rem;color:var(--mu);margin:1.2rem 0 1.8rem}
+.row{display:flex;gap:.75rem;flex-wrap:wrap;align-items:center}
+section.s{padding:4.5rem 0}
+.grid{display:grid;gap:1rem;grid-template-columns:repeat(auto-fit,minmax(250px,1fr))}
+.price{font-family:var(--fd);font-size:2rem;margin:.4rem 0}
+.price.hl{border-color:var(--em);box-shadow:0 0 40px rgba(16,185,129,.15)}
+ul.ck{list-style:none;padding:0;margin:1rem 0 0}ul.ck li{padding:.25rem 0 .25rem 1.4rem;position:relative;color:var(--mu)}ul.ck li:before{content:"";position:absolute;left:0;top:.7rem;width:8px;height:8px;border-radius:50%;background:var(--em)}
+footer{padding:2rem 0;border-top:1px solid var(--line);color:var(--mu);font-size:.85rem}
+.rv{opacity:0;transform:translateY(18px);transition:opacity .7s,transform .7s}.rv.in{opacity:1;transform:none}
+/* app */
+#app{display:none;min-height:100vh}
+#app.on{display:flex}
+aside{width:236px;background:var(--bg2);border-right:1px solid var(--line);padding:1rem .7rem;position:sticky;top:0;height:100vh;display:flex;flex-direction:column;gap:.2rem;z-index:5;transition:width .25s}
+aside.min{width:68px}aside.min .lbl,aside.min .logo span{display:none}
+.nav{display:flex;gap:.7rem;align-items:center;padding:.6rem .75rem;border-radius:10px;background:none;border:0;text-align:left;position:relative;transition:transform .2s,background .2s}
+.nav:hover{background:rgba(16,185,129,.1);transform:translateX(3px)}
+.nav.act{background:rgba(16,185,129,.16);color:var(--neon)}.nav.act:before{content:"";position:absolute;left:-.7rem;top:20%;bottom:20%;width:3px;border-radius:3px;background:var(--neon)}
+.nav svg{width:19px;height:19px;flex:none;stroke:currentColor;fill:none;stroke-width:1.8}
+main{flex:1;min-width:0;padding:1.4rem clamp(1rem,3vw,2.2rem) 3rem;position:relative;z-index:1}
+.top{display:flex;justify-content:space-between;align-items:center;gap:1rem;margin-bottom:1.5rem;flex-wrap:wrap}
+.chip{border:1px solid var(--line);border-radius:99px;padding:.3rem .8rem;font-size:.85rem;background:var(--bg2)}
+.kpis{display:grid;gap:1rem;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));margin-bottom:1.2rem}
+.kpi b{font-family:var(--fd);font-size:1.9rem;display:block}
+.bar{height:8px;border-radius:8px;background:#0c241b;overflow:hidden;margin-top:.7rem}.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--em),var(--neon));width:0;transition:width .8s}
+.empty{text-align:center;padding:2.2rem 1rem;border:1px dashed var(--line);border-radius:14px;color:var(--mu)}
+.empty h3{color:var(--tx);margin-bottom:.4rem}
+.notice{border:1px solid #5a4a16;background:rgba(245,196,81,.07);color:var(--warn);border-radius:12px;padding:.8rem 1rem;margin-bottom:1.2rem;font-size:.9rem}
+/* slider */
+.sl{position:relative;padding:2.4rem 0 .4rem}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:8px;border-radius:8px;background:linear-gradient(90deg,var(--em) var(--p,10%),#0c241b var(--p,10%));outline-offset:6px}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:50%;background:var(--neon);box-shadow:0 0 18px var(--neon);cursor:grab}
+input[type=range]::-moz-range-thumb{width:22px;height:22px;border:0;border-radius:50%;background:var(--neon);box-shadow:0 0 18px var(--neon)}
+#tip{position:absolute;top:0;transform:translateX(-50%);background:var(--neon);color:#00241a;font-weight:700;border-radius:8px;padding:.15rem .6rem;font-size:.85rem;white-space:nowrap;pointer-events:none}
+.big{font-family:var(--fd);font-size:2.6rem;color:var(--neon)}
+.fg{display:grid;gap:.9rem;grid-template-columns:repeat(auto-fit,minmax(190px,1fr))}
+label.f{display:block;font-size:.85rem;color:var(--mu)}
+input[type=text],select{width:100%;margin-top:.3rem;background:#06110d;border:1px solid var(--line);border-radius:9px;color:var(--tx);padding:.6rem .7rem;font:inherit}
+.kan{display:flex;gap:.8rem;overflow-x:auto;padding-bottom:.8rem}
+.col{min-width:190px;flex:1;background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:.7rem;min-height:220px}
+.col h4{margin:0 0 .6rem;font:600 .8rem var(--fd);color:var(--mu)}
+.col.over{border-color:var(--neon)}
+.view{display:none}.view.on{display:block}
+#menuBtn{display:none}
+@media(max-width:820px){aside{position:fixed;left:0;transform:translateX(-100%);width:250px}aside.open{transform:none}aside.min{width:250px}#menuBtn{display:inline-block}#globe{opacity:.35;right:-30%}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}.rv{opacity:1;transform:none}}
+</style>
+</head>
+<body>
+<div id="glow"></div>
+
+<!-- LANDING -->
+<div id="landing">
+<div class="wrap">
+<nav><div class="logo">Lead<b>Hunter</b></div><div class="row"><button class="btn ghost" data-go="app">Entrar</button><button class="btn" data-go="app">Começar grátis</button></div></nav>
+<div class="hero">
+<canvas id="globe" aria-hidden="true"></canvas>
+<div class="txt">
+<h1>Encontre empresas que ainda não possuem um site.</h1>
+<p>Descubra oportunidades reais, organize seus leads e transforme empresas locais em novos projetos.</p>
+<div class="row"><button class="btn" data-go="app">Começar grátis</button><span class="chip">30 leads grátis por semana</span></div>
+</div></div>
+</div>
+<div class="wrap">
+<section class="s"><h2 class="rv">Da busca ao site publicado, em um só lugar</h2>
+<div class="grid" style="margin-top:1.5rem">
+<div class="card tilt rv"><h3>Encontrar leads</h3><p class="mu">Empresas de uma fonte oficial, checadas uma a uma para saber se têm site próprio. Redes sociais e iFood não contam como site.</p></div>
+<div class="card tilt rv"><h3>CRM</h3><p class="mu">Pipeline de Novo a Fechado, com arrastar e soltar, notas, tags e próxima ação.</p></div>
+
+<div class="card tilt rv"><h3>Busca internacional</h3><p class="mu">País, região e cidade, exclusivo do plano MAX.</p></div>
+</div></section>
+<section class="s" id="planos"><h2 class="rv">Planos</h2>
+<div class="grid" style="margin-top:1.5rem">
+<div class="card tilt rv"><h3>FREE</h3><div class="price">R$ 0</div><b>30 leads por semana</b><ul class="ck"><li>Filtros básicos</li><li>CRM básico</li></ul></div>
+<div class="card tilt rv price hl"><h3>PRO</h3><div class="price">R$ 39,90<small class="mu" style="font-size:.9rem">/mês</small></div><b>200 leads por semana</b><ul class="ck"><li>Tudo do FREE</li><li>Filtros avançados e exportação</li><li>CRM completo e histórico</li><li>Análise de website</li></ul></div>
+<div class="card tilt rv"><h3>MAX</h3><div class="price">R$ 59,90<small class="mu" style="font-size:.9rem">/mês</small></div><b>400 leads por semana</b><ul class="ck"><li>Tudo do PRO</li><li>Busca internacional</li><li>Analytics avançado</li><li>Prioridade de processamento</li></ul></div>
+</div></section>
+<section class="s"><h2 class="rv">Créditos avulsos</h2>
+<div class="grid" style="margin-top:1.5rem;max-width:620px">
+<div class="card tilt rv"><h3>10 créditos</h3><div class="price">R$ 5</div><button class="btn" data-go="app" data-view="credits">Comprar créditos</button></div>
+<div class="card tilt rv"><h3>20 créditos</h3><div class="price">R$ 10</div><button class="btn" data-go="app" data-view="credits">Comprar créditos</button></div>
+</div></section>
+<footer>LeadHunter · Os dados empresariais vêm de fontes oficiais; dados pessoais são minimizados conforme a LGPD.</footer>
+</div></div>
+
+<!-- APP -->
+<div id="app">
+<aside id="side" aria-label="Menu principal">
+<div class="logo" style="padding:.4rem .75rem 1rem">L<span>ead<b>Hunter</b></span></div>
+<div id="navs"></div>
+<button class="nav" id="collapse" style="margin-top:auto" aria-label="Recolher menu"><svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg><span class="lbl">Recolher</span></button>
+</aside>
+<main>
+<div class="top"><div class="row"><button class="btn ghost" id="menuBtn" aria-label="Abrir menu">Menu</button><h2 id="vt">Dashboard</h2></div>
+<div class="row"><label class="mu" style="font-size:.8rem">Pré-visualizar plano
+<select id="plan" style="width:auto;margin:0 0 0 .4rem"><option value="FREE">FREE</option><option value="PRO">PRO</option><option value="MAX">MAX</option><option value="OWNER">OWNER</option></select></label>
+<span class="chip" id="cr">0 créditos</span><button class="btn ghost" data-go="land">Sair</button></div></div>
+<div class="notice" role="status">Conta conectada ao servidor. Busca de leads, CRM e PIX ainda não estão ligados, por isso não há leads nem pagamentos para mostrar.</div>
+
+<section class="view on" id="v-dash">
+<div class="kpis">
+<div class="card kpi"><span class="mu">Leads esta semana</span><b id="wk">0 / 30</b><div class="bar"><i id="wkb"></i></div></div>
+<div class="card kpi"><span class="mu">Leads sem website</span><b>0</b></div>
+
+<div class="card kpi"><span class="mu">Créditos</span><b>0</b></div>
+</div>
+<div class="empty"><h3>Comece sua primeira busca.</h3><p>Os gráficos de leads por semana, categoria e cidade aparecem depois da primeira busca.</p><button class="btn" data-view="filter">Filtrar leads</button></div>
+</section>
+
+<section class="view" id="v-filter">
+<div class="card">
+<div class="mu">Quantidade de leads</div>
+<div class="big" id="num">10</div>
+<div class="sl"><span id="tip">10 leads</span><input type="range" id="rng" min="0" max="30" value="10" aria-label="Quantidade de leads"></div>
+<div class="row" style="justify-content:space-between;margin:.3rem 0 1rem"><span class="mu">0</span><span class="mu" id="mx">30</span></div>
+<p id="lim" class="mu" role="status" style="min-height:1.4em"></p>
+<div class="fg">
+<label class="f">País<select><option>Brasil</option></select></label>
+<label class="f">Estado<select id="uf"></select></label>
+<label class="f">Cidade<input type="text" id="ct" placeholder="Ex.: Manaus"></label>
+<label class="f">Bairro<input type="text" id="hd"></label>
+<label class="f">Categoria<input type="text" id="cat" placeholder="Ex.: padaria"></label>
+<label class="f">Raio (km)<input type="text" value="5"></label>
+</div>
+<div class="row" style="margin-top:1rem"><label><input type="checkbox" id="onlyNo" checked> Empresas sem website</label><label><input type="checkbox"> Com telefone</label><label><input type="checkbox"> Com WhatsApp</label></div>
+<div class="row" style="margin-top:1.2rem"><button class="btn" id="apply">Aplicar filtros</button><span class="mu" id="intl"></span></div>
+</div>
+<div id="res" style="margin-top:1rem"></div>
+</section>
+
+<section class="view" id="v-leads"><div class="empty"><h3>Você ainda não salvou leads.</h3><p>Leads reais aparecem aqui depois de uma busca verificada.</p><button class="btn" data-view="filter">Filtrar leads</button></div></section>
+
+<section class="view" id="v-crm">
+<div class="card" style="margin-bottom:1rem"><h3 style="margin-bottom:.8rem">Adicionar lead</h3>
+<div class="fg"><label class="f">Empresa<input type="text" id="cN" maxlength="120"></label><label class="f">Telefone<input type="text" id="cP" maxlength="40"></label><label class="f">Cidade<input type="text" id="cC" maxlength="80"></label><label class="f">Contato<input type="text" id="cT" maxlength="80"></label><label class="f">Valor (R$)<input type="text" id="cV" placeholder="0,00"></label><label class="f">Próxima ação<input type="text" id="cA" maxlength="160"></label></div>
+<div class="row" style="margin-top:1rem"><button class="btn" id="cAdd">Salvar no CRM</button><span class="mu" id="crmMsg" role="status"></span></div></div>
+<div class="kan" id="kan"></div></section>
+
+
+
+<section class="view" id="v-ana"><div class="empty"><h3>Sem dados para analisar.</h3><p>Os gráficos usam apenas buscas e projetos registrados no banco.</p></div></section>
+
+<section class="view" id="v-credits">
+<div class="card" style="margin-bottom:1rem"><span class="mu">Carteira</span><div class="big">0 créditos</div><p class="mu">Cada movimentação registra quantidade, tipo, motivo, data, ID da transação, saldo antes e saldo depois. O saldo nunca fica negativo.</p></div>
+<div class="grid" style="max-width:640px">
+<div class="card tilt"><h3>10 créditos</h3><div class="price">R$ 5,00</div><button class="btn" disabled>Pagar com PIX</button></div>
+<div class="card tilt"><h3>20 créditos</h3><div class="price">R$ 10,00</div><button class="btn" disabled>Pagar com PIX</button></div>
+</div>
+<p class="mu" style="margin-top:1rem">O pagamento está desativado: falta configurar o provedor PIX e o webhook. Créditos só entram depois que o webhook confirma o pagamento.</p>
+<div class="empty" style="margin-top:1rem"><h3>Nenhuma movimentação ainda.</h3></div>
+</section>
+
+<section class="view" id="v-sub"><div class="empty"><h3>Plano atual: <span id="pn">FREE</span></h3><p>A troca de plano será ativada pelo webhook de pagamento (PRO R$ 39,90, MAX R$ 59,90).</p></div></section>
+
+<section class="view" id="v-cfg">
+<div class="card"><h3>Pagamentos · PIX</h3>
+<p class="mu">Visível apenas para o OWNER. Salvar exige o backend.</p>
+<div class="fg"><label class="f">Tipo da chave<select><option>CPF/CNPJ</option><option>E-mail</option><option>Telefone</option><option>Aleatória</option></select></label>
+<label class="f">Chave PIX<input type="text" autocomplete="off"></label>
+<label class="f">Nome do recebedor<input type="text"></label>
+<label class="f">Instituição<input type="text"></label></div>
+<div class="row" style="margin-top:1rem"><button class="btn" disabled>Salvar</button><span class="mu">Status: <b style="color:var(--warn)">não configurado</b></span></div></div>
+</section>
+</main>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+(function(){
+var RM=matchMedia('(prefers-reduced-motion: reduce)').matches;
+var $=function(s,r){return (r||document).querySelector(s)},$$=function(s,r){return [].slice.call((r||document).querySelectorAll(s))};
+// mouse glow + tilt
+var mx=.5,my=.5;
+addEventListener('pointermove',function(e){mx=e.clientX/innerWidth;my=e.clientY/innerHeight;if(!RM){var g=$('#glow');g.style.setProperty('--mx',e.clientX+'px');g.style.setProperty('--my',e.clientY+'px')}});
+$$('.tilt').forEach(function(c){if(RM)return;c.addEventListener('pointermove',function(e){var r=c.getBoundingClientRect(),x=(e.clientX-r.left)/r.width-.5,y=(e.clientY-r.top)/r.height-.5;c.style.transform='perspective(800px) translateY(-4px) rotateY('+x*6+'deg) rotateX('+-y*6+'deg)'});c.addEventListener('pointerleave',function(){c.style.transform=''})});
+// reveal
+var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}})},{threshold:.15});
+$$('.rv').forEach(function(el,i){el.style.transitionDelay=(i%4)*70+'ms';io.observe(el)});
+// globe
+try{
+var cv=$('#globe'),rd=new THREE.WebGLRenderer({canvas:cv,alpha:true,antialias:false});
+var low=(navigator.hardwareConcurrency||4)<4||innerWidth<700;
+rd.setPixelRatio(Math.min(devicePixelRatio,low?1:1.75));
+var sc=new THREE.Scene(),cam=new THREE.PerspectiveCamera(40,1,.1,50);cam.position.z=4.2;
+var G=new THREE.Group();sc.add(G);
+var seg=low?20:36;
+G.add(new THREE.Mesh(new THREE.SphereGeometry(1.2,seg,seg),new THREE.MeshBasicMaterial({color:0x04281d,transparent:true,opacity:.55})));
+G.add(new THREE.LineSegments(new THREE.WireframeGeometry(new THREE.SphereGeometry(1.205,seg/2,seg/2)),new THREE.LineBasicMaterial({color:0x10b981,transparent:true,opacity:.35})));
+var atm=new THREE.Mesh(new THREE.SphereGeometry(1.32,32,32),new THREE.MeshBasicMaterial({color:0x4dffb0,transparent:true,opacity:.06,side:THREE.BackSide}));G.add(atm);
+function pt(n,r,size,col){var p=new Float32Array(n*3);for(var i=0;i<n;i++){var u=Math.random()*2-1,t=Math.random()*6.283,s=Math.sqrt(1-u*u);p[i*3]=r*s*Math.cos(t);p[i*3+1]=r*u;p[i*3+2]=r*s*Math.sin(t)}var g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.BufferAttribute(p,3));return new THREE.Points(g,new THREE.PointsMaterial({color:col,size:size,transparent:true,opacity:.95}))}
+G.add(pt(low?60:140,1.215,.04,0x4dffb0));
+var orb=pt(low?80:220,1.9,.015,0x10b981);sc.add(orb);
+function fit(){var w=cv.clientWidth;rd.setSize(w,w,false);cam.aspect=1;cam.updateProjectionMatrix()}
+fit();addEventListener('resize',fit);
+var vis=true;new IntersectionObserver(function(e){vis=e[0].isIntersecting}).observe(cv);
+(function loop(){requestAnimationFrame(loop);if(!vis||$('#landing').style.display==='none')return;
+var k=RM?0:1;G.rotation.y+=.0018*k;G.rotation.x+=((my-.5)*.5-G.rotation.x)*.04;G.rotation.z+=((mx-.5)*.3-G.rotation.z)*.04;orb.rotation.y-=.0007*k;rd.render(sc,cam)})();
+}catch(err){var c=$('#globe');if(c)c.style.display='none'}
+// nav
+var views=[['dash','Dashboard','M3 11l9-8 9 8v9a1 1 0 01-1 1h-5v-6H9v6H4a1 1 0 01-1-1z'],['filter','Filtrar leads','M11 4a7 7 0 100 14 7 7 0 000-14zM21 21l-5-5'],['leads','Meus leads','M12 2l3 7 7 .6-5.3 4.7 1.6 7.2L12 17.8 5.7 21.5l1.6-7.2L2 9.6 9 9z'],['crm','CRM','M4 4h5v16H4zM10 4h5v10h-5zM16 4h4v13h-4z'],['ana','Analytics','M4 20V10M10 20V4M16 20v-7M22 20H2'],['credits','Créditos','M3 6h18v12H3zM3 10h18'],['sub','Assinatura','M12 2l3 6 6 1-4.5 4.4L17.5 20 12 17l-5.5 3 1-6.6L3 9l6-1z'],['cfg','Configurações','M12 8a4 4 0 100 8 4 4 0 000-8zM12 2v3M12 19v3M2 12h3M19 12h3']];
+$('#navs').innerHTML=views.map(function(v){return '<button class="nav" data-view="'+v[0]+'"><svg viewBox="0 0 24 24"><path d="'+v[2]+'"/></svg><span class="lbl">'+v[1]+'</span></button>'}).join('');
+function show(id){$$('.view').forEach(function(x){x.classList.toggle('on',x.id==='v-'+id)});$$('.nav[data-view]').forEach(function(n){n.classList.toggle('act',n.dataset.view===id);if(n.dataset.view===id)$('#vt').textContent=n.textContent});$('#side').classList.remove('open');if(id==='crm')loadCrm();scrollTo(0,0)}
+function go(w,v){var app=w==='app';$('#landing').style.display=app?'none':'';$('#app').classList.toggle('on',app);if(app)show(v||'dash');else scrollTo(0,0)}
+document.addEventListener('click',function(e){var b=e.target.closest('[data-go],[data-view]');if(!b)return;if(b.dataset.go==='land'){fetch('/api/logout',{method:'POST'}).finally(function(){location.href='/'});return}if(b.dataset.go==='app'){location.href='/entrar';return}if(b.dataset.go)go(b.dataset.go,b.dataset.view);else show(b.dataset.view)});
+$('#collapse').onclick=function(){$('#side').classList.toggle('min')};
+$('#menuBtn').onclick=function(){$('#side').classList.toggle('open')};
+// CRM (dados reais do servidor)
+var SK=['NOVO','CONTATO','RESPONDEU','REUNIAO','PROPOSTA','NEGOCIACAO','FECHADO','PERDIDO'],SL=['Novo','Contato','Respondeu','Reunião','Proposta','Negociação','Fechado','Perdido'],deals=[];
+function api(m,u,b){return fetch(u,{method:m,headers:{'Content-Type':'application/json'},body:b?JSON.stringify(b):undefined}).then(function(r){return r.json().then(function(d){if(!r.ok)throw new Error(d.error||'Tente novamente.');return d})})}
+function E(t,x,c){var e=document.createElement(t);if(x!=null)e.textContent=x;if(c)e.className=c;return e}
+function msg(t){$('#crmMsg').textContent=t}
+function loadCrm(){api('GET','/api/crm').then(function(d){deals=d.deals;drawCrm()}).catch(function(e){msg(e.message)})}
+function patch(d,body){return api('PATCH','/api/crm/'+d.id,body).then(function(){Object.assign(d,body.nextAction!==undefined?{next_action:body.nextAction}:{},body.stage?{stage:body.stage}:{},body.notes!==undefined?{notes:body.notes}:{});drawCrm()}).catch(function(e){msg(e.message)})}
+function mini(t,f){var b=E('button',t,'btn ghost');b.style.cssText='padding:.2rem .5rem;font-size:.75rem;margin:.2rem .3rem 0 0';b.onclick=f;return b}
+function cardEl(d){var c=E('div',null,'card');c.style.cssText='padding:.7rem;margin-bottom:.6rem;font-size:.85rem';c.draggable=true;
+c.ondragstart=function(e){e.dataTransfer.setData('text/plain',d.id)};
+var n=E('b',d.name);n.style.display='block';c.appendChild(n);
+[d.phone,d.address||d.city,d.contact?('Contato: '+d.contact):null,d.value_cents!=null?('R$ '+(d.value_cents/100).toFixed(2).replace('.',',')):null,d.next_action?('Próxima: '+d.next_action):null,d.notes?('Notas: '+d.notes):null].forEach(function(x){if(x){var p=E('div',x,'mu');c.appendChild(p)}});
+if(d.maps_url&&/^https:\/\//.test(d.maps_url)){var ma=E('a','Abrir no Maps','btn ghost');ma.href=d.maps_url;ma.target='_blank';ma.rel='noopener';ma.style.cssText='padding:.2rem .5rem;font-size:.75rem;text-decoration:none;display:inline-block;margin-top:.4rem';c.appendChild(ma)}var sel=document.createElement('select');sel.setAttribute('aria-label','Etapa de '+d.name);sel.style.marginTop='.5rem';SK.forEach(function(s,i){var o=E('option',SL[i]);o.value=s;if(s===d.stage)o.selected=true;sel.appendChild(o)});sel.onchange=function(){patch(d,{stage:sel.value})};c.appendChild(sel);
+c.appendChild(mini('Notas',function(){var v=prompt('Notas',d.notes||'');if(v!==null)patch(d,{notes:v})}));
+c.appendChild(mini('Ação',function(){var v=prompt('Próxima ação',d.next_action||'');if(v!==null)patch(d,{nextAction:v})}));
+c.appendChild(mini('Excluir',function(){if(confirm('Excluir este lead do CRM?'))api('DELETE','/api/crm/'+d.id).then(loadCrm).catch(function(e){msg(e.message)})}));return c}
+function drawCrm(){var k=$('#kan');k.textContent='';SK.forEach(function(s,i){var col=E('div',null,'col');col.setAttribute('aria-label',SL[i]);var n=deals.filter(function(d){return d.stage===s});col.appendChild(E('h4',SL[i]+' · '+n.length));
+col.ondragover=function(e){e.preventDefault();col.classList.add('over')};col.ondragleave=function(){col.classList.remove('over')};
+col.ondrop=function(e){e.preventDefault();col.classList.remove('over');var id=e.dataTransfer.getData('text/plain'),d=deals.filter(function(x){return x.id===id})[0];if(d&&d.stage!==s)patch(d,{stage:s})};
+n.forEach(function(d){col.appendChild(cardEl(d))});k.appendChild(col)})}
+$('#cAdd').onclick=function(){var v=$('#cV').value.trim().replace(',','.'),cents=v?Math.round(parseFloat(v)*100):null;if(v&&isNaN(cents)){msg('Valor inválido.');return}
+msg('Salvando...');api('POST','/api/crm',{name:$('#cN').value,phone:$('#cP').value,city:$('#cC').value,contact:$('#cT').value,valueCents:cents,nextAction:$('#cA').value}).then(function(){['cN','cP','cC','cT','cV','cA'].forEach(function(i){$('#'+i).value=''});msg('Lead salvo.');loadCrm()}).catch(function(e){msg(e.message)})};
+// UFs
+var ufs='AC AL AP AM BA CE DF ES GO MA MT MS MG PA PB PR PE PI RJ RN RS RO RR SC SP SE TO'.split(' ');
+$('#uf').innerHTML=ufs.map(function(u){return '<option'+(u==='AM'?' selected':'')+'>'+u+'</option>'}).join('');
+// plan + slider
+var LIM={FREE:30,PRO:200,MAX:400,OWNER:1000},rng=$('#rng'),shown=10,raf;
+function setNum(v){cancelAnimationFrame(raf);var from=shown,t0=performance.now();(function s(t){var k=RM?1:Math.min((t-t0)/220,1);shown=Math.round(from+(v-from)*k);$('#num').textContent=shown;if(k<1)raf=requestAnimationFrame(s)})(t0)}
+function upd(){var p=$('#plan').value,m=LIM[p],v=+rng.value,msg='';
+if(v>m){v=m;rng.value=m;msg='Seu plano '+p+' permite até '+m+' leads por semana.'}
+rng.max=m;var pct=v/m*100;rng.style.setProperty('--p',pct+'%');
+var tip=$('#tip');tip.textContent=v+' leads';var w=rng.offsetWidth;tip.style.left=(11+(w-22)*pct/100)+'px';
+$('#lim').textContent=msg;$('#mx').textContent=m;setNum(v)}
+rng.addEventListener('input',upd);
+$('#plan').addEventListener('change',function(){var p=$('#plan').value,m=LIM[p];rng.max=m;$('#wk').textContent='0 / '+m;$('#pn').textContent=p;$('#intl').textContent=(p==='MAX'||p==='OWNER')?'Busca internacional liberada no MAX (requer fonte de dados configurada).':'';upd()});
+function resMsg(t){var d=E('div',null,'empty');d.appendChild(E('h3',t));var r=$('#res');r.textContent='';r.appendChild(d)}
+function resCard(r){var c=E('div',null,'card');c.style.marginBottom='.7rem';var h=E('b',r.name);h.style.fontSize='1.05rem';c.appendChild(h);
+var st=E('div',r.statusLabel);st.style.cssText='margin:.3rem 0;font-weight:600;color:'+(r.status==='SITE_FOUND'?'#6aa7ff':'#4dffb0');c.appendChild(st);
+[r.rating!=null?'Avaliação: '+r.rating+' ('+(r.reviews||0)+' avaliações)':null,r.phone?'Telefone: '+r.phone:'Telefone não informado pela fonte','Endereço: '+(r.address||'não informado'),r.website?'Website informado: '+r.website:'Website não informado pela fonte',r.verification?'Verificação: '+r.verification:null,'Fonte: Google Places · consultado em '+new Date().toLocaleDateString('pt-BR')].forEach(function(x){if(x)c.appendChild(E('div',x,'mu'))});
+var row=E('div',null,'row');row.style.marginTop='.7rem';
+if(r.mapsUrl&&/^https:\/\//.test(r.mapsUrl)){var a=E('a','Maps','btn ghost');a.href=r.mapsUrl;a.target='_blank';a.rel='noopener';a.style.textDecoration='none';row.appendChild(a)}
+if(r.whatsapp){var w=E('a','Tentar WhatsApp','btn ghost');w.href='https://wa.me/'+r.whatsapp;w.target='_blank';w.rel='noopener';w.title='Número de celular; não verificamos se tem WhatsApp';w.style.textDecoration='none';row.appendChild(w)}
+var sv=E('button','Salvar no CRM','btn');sv.onclick=function(){sv.disabled=true;api('POST','/api/crm',{name:r.name,phone:r.phone,address:r.address,category:r.category,city:$('#ct').value,state:$('#uf').value,placeId:r.placeId,mapsUrl:r.mapsUrl,website:r.website,rating:r.rating,reviews:r.reviews}).then(function(){sv.textContent='Salvo no CRM'}).catch(function(e){sv.disabled=false;sv.textContent=e.message})};
+row.appendChild(sv);c.appendChild(row);return c}
+$('#apply').onclick=function(){var b=$('#apply');b.disabled=true;resMsg('Consultando e verificando websites (pode levar até 1 minuto)...');
+api('POST','/api/search',{category:$('#cat').value,city:$('#ct').value,neighborhood:$('#hd').value,state:$('#uf').value,country:'Brasil',count:+rng.value,onlyNoSite:$('#onlyNo').checked}).then(function(d){b.disabled=false;var r=$('#res');r.textContent='';
+if(!d.results.length){resMsg('Não encontramos empresas correspondentes aos filtros.');return}
+if(d.limited){var n=E('div','Mostrando apenas o que ainda cabe no seu limite semanal.','notice');r.appendChild(n)}
+d.results.forEach(function(x){r.appendChild(resCard(x))})}).catch(function(e){b.disabled=false;resMsg(e.message)})};
+addEventListener('resize',upd);
+$('#plan').dispatchEvent(new Event('change'));
+if(location.pathname==='/app'){fetch('/api/me').then(function(r){if(!r.ok)throw 0;return r.json()}).then(function(m){
+go('app');var pl=$('#plan');pl.value=m.role;pl.dispatchEvent(new Event('change'));pl.parentNode.style.display='none';
+var lim=m.weeklyLimit;$('#wk').textContent=m.weeklyUsed+' / '+(lim==null?'ilimitado':lim);$('#wkb').style.width=(lim?Math.min(100,m.weeklyUsed/lim*100):0)+'%';
+$('#cr').textContent=m.credits+' créditos'}).catch(function(){location.href='/entrar'})}
+})();
+</script>
+</body>
+</html>
